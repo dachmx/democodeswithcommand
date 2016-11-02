@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd">  
+  
+    <!-- DataSource -->  
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"  
+        destroy-method="close">  
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />  
+        <property name="jdbcUrl"   
+            value="jdbc:mysql://127.0.0.1:3306/forssh" />  
+        <property name="user" value="root" />  
+        <property name="password" value="" />  
+    </bean>  
+  
+    <!-- SessionFactory -->  
+    <bean id="sessionFactory"  
+        class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"  
+        p:dataSource-ref="dataSource"    
+        p:configLocation="classpath:hibernate.cfg.xml" />
+  
+    <!-- TransactionManager -->  
+    <bean id="transactionManager"  
+        class="org.springframework.orm.hibernate4.HibernateTransactionManager"  
+        p:sessionFactory-ref="sessionFactory" />  
+  
+    <!-- Spring Advice -->  
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">  
+        <tx:attributes>  
+            <tx:method name="get*" read-only="true"></tx:method>  
+            <tx:method name="*"></tx:method>  
+        </tx:attributes>  
+    </tx:advice>  
+  
+    <!-- Spring Aop Config -->  
+    <aop:config>  
+        <aop:pointcut id="pointcut"  
+            expression="  
+                execution(* com.txazo.service.impl.*Impl.*(..))" />  
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut" />  
+    </aop:config>  
+  
+    <!-- Dao -->  
+    <bean id="baseDao" class="com.txazo.dao.impl.BaseDaoImpl">  
+        <property name="sessionFactory">  
+            <ref bean="sessionFactory" />  
+        </property>  
+    </bean>  
+  
+    <!-- Service -->  
+    <bean id="userService" class="com.txazo.service.impl.UserServiceImpl">  
+        <property name="baseDao">  
+            <ref bean="baseDao" />  
+        </property>  
+    </bean>  
+    <bean id="mytestservice" class="com.txazo.service.MyTestService"></bean> 
+  
+    <!-- Action -->  
+    <!-- <bean id="loginAction" class="com.txazo.action.LoginAction"    
+        scope="session">  -->
+    <bean id="loginAction" class="com.txazo.action.LoginAction"    
+        scope="prototype">  
+        <property name="userService">  
+            <ref bean="userService" />  
+        </property>  
+    </bean>  
+  
+</beans> 
