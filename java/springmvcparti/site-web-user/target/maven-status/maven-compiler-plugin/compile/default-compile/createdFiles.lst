@@ -1,0 +1,4 @@
+org\xdemo\example\site\web\user\controller\SystemController.class
+org\xdemo\example\site\web\user\Service\HelloServiceImpl.class
+org\xdemo\example\site\web\user\controller\Hello.class
+org\xdemo\example\site\web\user\Service\HelloService.class
