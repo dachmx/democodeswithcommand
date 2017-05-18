@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Title: Base Java
+Implementation-Version: 1.0
+Main-Class: com.dachmx.codes.proxyjava.ProxyJava
+
